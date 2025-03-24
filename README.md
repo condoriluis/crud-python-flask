@@ -11,10 +11,15 @@ Este proyecto es un **CRUD (Create, Read, Update, Delete)** de **usuarios, produ
 ### 🛠️ Funcionalidades
 
 ✅ Autenticación de Usuarios (Registro, Inicio de Sesión y Cierre de Sesión).
+
 ✅ CRUD de Usuarios, Productos y Categorías (Crear, Leer, Actualizar y Eliminar).
+
 ✅ Interfaz Responsiva con Bootstrap 5.
+
 ✅ Gráficos con Chart.js.
+
 ✅ Tablas Interactivas con DataTables.
+
 ✅ Alertas Modernas con SweetAlert2.
 
 ## ⚙️ Instalación y Configuración

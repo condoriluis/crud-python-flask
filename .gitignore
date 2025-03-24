@@ -27,11 +27,6 @@ node_modules/
 package-lock.json
 yarn.lock
 
-uploads/
-media/
-static/img/productos/
-static/img/users/
-
 .vscode/
 .idea/
 *.sublime-project

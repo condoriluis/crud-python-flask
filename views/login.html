@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/admin-lte/3.2.0/css/adminlte.min.css">
+    <style>
+        body {
+          background-image: url('/static/img/fondo.jpg');
+          background-size: cover;
+          background-position: center;
+          background-repeat: no-repeat; 
+          height: 100vh;
+          margin: 0;
+        }
+    </style>
+</head>
+<body class="hold-transition login-page">
+<div class="login-box">
+  <div class="login-logo">
+    <a href="/login" class="text-dark"><b>Sistema</b></a>
+  </div>
+  <div class="card">
+    <div class="card-body login-card-body">
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          {% for category, message in messages %}
+            <div class="alert alert-{{ category }}">{{ message }}</div>
+          {% endfor %}
+        {% endif %}
+      {% endwith %}
+      <p class="login-box-msg">Ingresa tus credenciales<br>para iniciar tu sesión</p>
+
+      <form method="POST" action="/login">
+        <div class="input-group mb-3">
+          <input type="email" class="form-control" placeholder="Tu Email" name="email">
+          <div class="input-group-append">
+            <div class="input-group-text">
+              <span class="fas fa-user"></span>
+            </div>
+          </div>
+        </div>
+        <div class="input-group mb-3">
+          <input type="password" class="form-control" placeholder="Tu Password" name="password">
+          <div class="input-group-append">
+            <div class="input-group-text">
+              <span class="fas fa-lock"></span>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-6">
+            <div class="icheck-primary">
+              <input type="checkbox" id="remember">
+              <label for="remember">
+                Recordar
+              </label>
+            </div>
+          </div>
+          <div class="col-6">
+            <button type="submit" class="btn btn-primary btn-block">Iniciar session</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/admin-lte/3.2.0/js/adminlte.min.js"></script>
+</body>
+</html>

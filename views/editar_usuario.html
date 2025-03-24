@@ -1,0 +1,158 @@
+{% extends 'index.html' %}
+
+{% block dynamic_content %}
+<div class="content-wrapper" style="min-height: 1604.44px;">
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+        <div class="container-fluid">
+            <div class="row mb-2">
+                <div class="col-sm-6">
+                    <h1>Editar Usuario</h1>
+                </div>
+                <div class="col-sm-6">
+                    <ol class="breadcrumb float-sm-right">
+                        <li class="breadcrumb-item"><a href="/inicio">Inicio</a></li>
+                        <li class="breadcrumb-item active">Editar Usuario</li>
+                    </ol>
+                </div>
+            </div>
+        </div><!-- /.container-fluid -->
+    </section>
+
+    <!-- Main content -->
+    <section class="content">
+
+        <!-- Default box -->
+        <div class="card">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                    <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                        <strong>Mensaje!</strong> {{ message }}
+                        <button type="button" class="close" data-bs-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+            <div class="card-body col-md-6 offset-md-3">
+                <h4>Datos de usuario</h4>
+                <form method="post" action="{{ url_for('editar_usuario', usuario_id=usuario.id) }}" enctype="multipart/form-data">
+                    <div class="form-group">
+                        <label for="nombre">Nombre de usuario:</label> 
+                        <input type="text" class="form-control" id="nombre" name="nombre" value="{{ usuario.nombre }}" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="email">Email:</label>
+                        <input type="email" class="form-control" id="email" name="email" value="{{ usuario.email }}" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="password">Contraseña:</label>
+                        <input type="password" class="form-control" id="password" name="password">
+                    </div>
+                    <div class="form-group">
+                        <label for="perfil">Perfil:</label>
+                        <select class="form-control" id="perfil" name="perfil" required>
+                            <option value="">-- Seleccionar perfil --</option>
+                            <option value="admin" {% if usuario.perfil == 'admin' %} selected {% endif %}>Administrador</option>
+                            <option value="editor" {% if usuario.perfil == 'editor' %} selected {% endif %}>Editor</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="foto">Foto:</label>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <input type="file" class="form-control-file mb-3 foto" id="foto" name="foto" accept="image/*">
+                                <button type="submit" class="btn btn-primary">Editar</button>
+                                <a href="/usuarios" class="btn btn-secondary">Cancelar</a>  
+                            </div>
+                            <div class="col-md-6">
+                                {% if usuario.foto %}
+                                    <img src="{{ url_for('static', filename='img/' + usuario.foto) }}" class='img-circle previsualizarImg' style='width:60px'>
+                                {% else %}
+                                <img src="{{ url_for('static', filename='img/users/default.png') }}" class='img-circle previsualizarImg' style='width:60px'>
+                                {% endif %}
+                            </div>
+
+                        </div>
+                    </div>
+    
+                </form>
+            </div>
+
+        </div>
+        <!-- /.card -->
+
+    </section>
+    <!-- /.content -->
+    
+</div>
+<script>
+
+    $(".foto").change(function(){
+
+        var imagen = this.files[0];
+
+        if(imagen["type"] != "image/jpeg" && imagen["type"] != "image/png"){
+
+            $(".foto").val("");
+
+            Swal.fire({
+              title: "Error al subir la imagen",
+              text: "¡La imagen debe estar en formato JPG o PNG!",
+              icon: "error",
+              confirmButtonText: "¡Cerrar!"
+            });
+
+            return;
+
+        }else if(imagen["size"] > 2000000){
+
+            $(".foto").val("");
+
+            Swal.fire({
+              title: "Error al subir la imagen",
+              text: "¡La imagen no debe pesar más de 2MB!",
+              icon: "error",
+              confirmButtonText: "¡Cerrar!"
+            });
+
+            return;
+
+        }else{
+
+            var datosImagen = new FileReader;
+            datosImagen.readAsDataURL(imagen);
+
+            $(datosImagen).on("load", function(event){
+            
+                var rutaImagen = event.target.result;
+
+                $(".previsualizarImg").attr("src", rutaImagen);
+
+            })
+        }
+
+    })
+
+    function mostrarAlerta() {
+        return Swal.fire({
+            icon: 'success',
+            title: '¡Éxito!',
+            text: 'El usuario se ha actualizado correctamente.',
+            confirmButtonText: 'Aceptar'
+        });
+    }
+
+    const form = document.querySelector('form');
+
+    form.addEventListener('submit', function(event) {
+        event.preventDefault();
+        mostrarAlerta().then(() => {
+            form.submit();
+        });
+    });
+</script>
+{% endblock %}

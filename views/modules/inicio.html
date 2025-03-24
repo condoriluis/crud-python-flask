@@ -1,0 +1,145 @@
+<div class="content-wrapper" style="min-height: 1604.44px;">
+  <!-- Content Header (Page header) -->
+  <section class="content-header">
+    <div class="container-fluid">
+      <div class="row mb-2">
+        <div class="col-sm-6">
+          <h1>Dasboard</h1>
+        </div>
+        <div class="col-sm-6">
+          <ol class="breadcrumb float-sm-right">
+            <li class="breadcrumb-item"><a href="/inicio">Inicio</a></li>
+            <li class="breadcrumb-item active">Dasboard</li>
+          </ol>
+        </div>
+      </div>
+    </div><!-- /.container-fluid -->
+  </section>
+
+  <!-- Main content -->
+  <section class="content">
+
+    <!-- Default box -->
+    <div class="card">
+     
+      <div class="card-body">
+       <div class="row">
+        <div class="col-lg-3 col-6">
+          <!-- small box -->
+          <div class="small-box bg-lightblue">
+              <div class="inner">
+                <h3>{{ categorias|length }}</h3>
+
+                <p>Categorías</p>
+              </div>
+              <div class="icon">
+                <i class="ion ion-bag"></i>
+              </div>
+              <a href="/categorias" class="small-box-footer">Más info <i class="fas fa-arrow-circle-right"></i></a>
+            </div>
+        </div>
+        <!-- ./col -->
+        <div class="col-lg-3 col-6">
+          <!-- small box -->
+          <div class="small-box bg-purple text-white">
+            <div class="inner">
+              <h3 class="bg-purple disabled">{{ productos|length }}</h3>
+
+              <p>Productos</p>
+            </div>
+            <div class="icon">
+              <i class="fas fa-file-alt"></i>
+            </div>
+            <a href="productos" class="small-box-footer">Más info <i class="fas fa-arrow-circle-right"></i></a>
+          </div>
+        </div>
+        <!-- ./col -->
+        <div class="col-lg-3 col-6">
+          <!-- small box -->
+          <div class="small-box bg-warning">
+            <div class="inner">
+              <h3 class="bg-warning disabled">{{ usuarios|length }}</h3>
+
+              <p>Usuarios</p>
+            </div>
+            <div class="icon">
+              <i class="fas fa-bullhorn"></i>
+            </div>
+            <a href="/usuarios" class="small-box-footer">Más info <i class="fas fa-arrow-circle-right"></i></a>
+          </div>
+        </div>
+        <!-- ./col -->
+        <div class="col-lg-3 col-6">
+          <!-- small box -->
+          <div class="small-box bg-gray-dark text-white">
+            <div class="inner">
+              <h3 class="bg-gray-dark disabled">8</h3>
+
+              <p>Ajustes</p>
+            </div>
+            <div class="icon">
+              <i class="fas fa-user-cog"></i>
+            </div>
+            <a href="/ajustes" class="small-box-footer">Más info <i class="fas fa-arrow-circle-right"></i></a>
+          </div>
+        </div>
+        <!-- ./col -->
+      </div>
+      <hr class="mt-3">
+      <h4>Gráfico de Productos</h4>
+      <!-- Agregar un lienzo canvas para el gráfico -->
+      <canvas id="myChart" width="400" height="140"></canvas>
+    </div>
+    
+  </div>
+  <!-- /.card -->
+
+</section>
+<!-- /.content -->
+</div>
+<script>
+
+  $(document).ready(function() {
+  
+      var nombres = [];
+      var precios = [];
+      var cantidades = [];
+      var tipos = [];
+
+      {% for producto in productos %}
+      nombres.push("{{ producto.nombre }}");
+      precios.push({{ producto.precio }});
+      cantidades.push({{ producto.cantidad }});
+      tipos.push("{{ producto.tipo }}");
+      {% endfor %}
+
+      var ctx = document.getElementById('myChart').getContext('2d');
+      var myChart = new Chart(ctx, {
+          type: 'bar',
+          data: {
+              labels: nombres,
+              datasets: [{
+                  label: 'Precio',
+                  data: precios,
+                  backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                  borderColor: 'rgba(255, 99, 132, 1)',
+                  borderWidth: 1
+              }, {
+                  label: 'Cantidad',
+                  data: cantidades,
+                  backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                  borderColor: 'rgba(54, 162, 235, 1)',
+                  borderWidth: 1
+              }]
+          },
+          options: {
+              scales: {
+                  y: {
+                      beginAtZero: true
+                  }
+              }
+          }
+      });
+
+  });
+</script>

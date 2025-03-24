@@ -1,0 +1,159 @@
+{% extends 'index.html' %}
+
+{% block dynamic_content %}
+<div class="content-wrapper" style="min-height: 1604.44px;">
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+        <div class="container-fluid">
+            <div class="row mb-2">
+                <div class="col-sm-6">
+                    <h1>Agregar Producto</h1>
+                </div>
+                <div class="col-sm-6">
+                    <ol class="breadcrumb float-sm-right">
+                        <li class="breadcrumb-item"><a href="/inicio">Inicio</a></li>
+                        <li class="breadcrumb-item active">Agregar Producto</li>
+                    </ol>
+                </div>
+            </div>
+        </div><!-- /.container-fluid -->
+    </section>
+
+    <!-- Main content -->
+    <section class="content">
+
+        <!-- Default box -->
+        <div class="card">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                    <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                        <strong>Mensaje!</strong> {{ message }}
+                        <button type="button" class="close" data-bs-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+            <div class="card-body col-md-6 offset-md-3">
+                <h4>Datos del Producto</h4>
+                <form method="post" action="{{ url_for('agregar_producto') }}" enctype="multipart/form-data">
+                    <div class="form-group">
+                        <label for="nombre">Nombre:</label>
+                        <input type="text" class="form-control" id="nombre" name="nombre" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="descripcion">Descripción:</label>
+                        <textarea class="form-control" id="descripcion" rows="3" name="descripcion" required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="cantidad">Cantidad:</label>
+                        <input type="number" class="form-control" id="cantidad" name="cantidad" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="precio">Precio:</label>
+                        <input type="number" step="0.01" class="form-control" id="precio" name="precio" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="categoria">Categoría:</label>
+                        <select class="form-control" id="categoria" name="categoria" required>
+                            <option value="">-- Seleccionar categoría --</option>
+                            {% for categoria in categorias %}
+                            {% if categoria.estado == 'active' %}
+                            <option value="{{ categoria.id }}">{{ categoria.categoria }}</option>
+                            {% endif %}
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="foto">Foto:</label>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <input type="file" class="form-control-file mb-3 foto" id="foto" name="foto" accept="image/*">
+                                <button type="submit" class="btn btn-primary">Agregar</button>
+                                <a href="/productos" class="btn btn-secondary">Cancelar</a>  
+                            </div>
+                            <div class="col-md-6">
+                               <img src="{{ url_for('static', filename='img/productos/default-image.jpg') }}" class="img-fluid previsualizarImg w-50" width="100%"> 
+                            </div>
+
+                        </div>
+                    </div>
+
+                </form>
+            </div>
+
+        </div>
+        <!-- /.card -->
+
+    </section>
+    <!-- /.content -->
+    
+</div>
+<script>
+
+    $(".foto").change(function(){
+
+        var imagen = this.files[0];
+
+        if(imagen["type"] != "image/jpeg" && imagen["type"] != "image/png"){
+
+            $(".foto").val("");
+
+            Swal.fire({
+              title: "Error al subir la imagen",
+              text: "¡La imagen debe estar en formato JPG o PNG!",
+              icon: "error",
+              confirmButtonText: "¡Cerrar!"
+            });
+
+            return;
+
+        }else if(imagen["size"] > 2000000){
+
+            $(".foto").val("");
+
+            Swal.fire({
+              title: "Error al subir la imagen",
+              text: "¡La imagen no debe pesar más de 2MB!",
+              icon: "error",
+              confirmButtonText: "¡Cerrar!"
+            });
+
+            return;
+
+        }else{
+
+            var datosImagen = new FileReader;
+            datosImagen.readAsDataURL(imagen);
+
+            $(datosImagen).on("load", function(event){
+            
+                var rutaImagen = event.target.result;
+
+                $(".previsualizarImg").attr("src", rutaImagen);
+
+            })
+        }
+
+    })
+
+    function mostrarAlerta() {
+        return Swal.fire({
+            icon: 'success',
+            title: '¡Éxito!',
+            text: 'El producto se ha agregado correctamente.',
+            confirmButtonText: 'Aceptar'
+        });
+    }
+    const form = document.querySelector('form');
+    form.addEventListener('submit', function(event) {
+        event.preventDefault();
+        mostrarAlerta().then(() => {
+            form.submit();
+        });
+    });
+</script>
+{% endblock %}

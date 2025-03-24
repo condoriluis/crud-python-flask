@@ -1,0 +1,141 @@
+{% extends 'index.html' %}
+
+{% block dynamic_content %}
+<div class="content-wrapper" style="min-height: 1604.44px;">
+  <!-- Content Header (Page header) -->
+  <section class="content-header">
+    <div class="container-fluid">
+      <div class="row mb-2">
+        <div class="col-sm-6">
+          <h1>Productos</h1>
+        </div>
+        <div class="col-sm-6">
+          <ol class="breadcrumb float-sm-right">
+            <li class="breadcrumb-item"><a href="/inicio">Inicio</a></li>
+            <li class="breadcrumb-item active">Productos</li>
+          </ol>
+        </div>
+      </div>
+    </div><!-- /.container-fluid -->
+  </section>
+
+  <!-- Main content -->
+  <section class="content">
+
+    <!-- Default box -->
+    <div class="card">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                    <strong>Mensaje!</strong> {{ message }}
+                    <button type="button" class="close" data-bs-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+        <div class="card-header">
+            <div class="d-flex justify-content-between">
+                <h4>Lista de Productos</h4>
+                <a href="{{ url_for('agregar_producto') }}" class="btn btn-primary mb-3"><i class="fas fa-plus"></i> Agregar Producto</a>
+            </div>
+            
+        </div>
+        <div class="card-body">
+            
+            <div class="table-responsive">
+
+                <table id="productosTable" class="table table-bordered table-hover table-striped" width="100%">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Nombre</th>
+                            <th>Descripción</th>
+                            <th>Cantidad</th>
+                            <th>Precio</th>
+                            <th>Categoría</th>
+                            <th>Foto</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for producto in productos %}
+                        <tr>
+                            <td>{{ loop.index }}</td>
+                            <td>{{ producto.nombre }}</td>
+                            <td>{{ producto.descripcion }}</td>
+                            <td class="text-center"><span class="badge badge-info">{{ producto.cantidad }}</span></td>
+                            <td>{{ producto.precio }}</td>
+                            <td><span class="badge badge-primary">
+                                {% for categoria in categorias %}
+                                    {% if producto.categoria == categoria.id %}
+                                        {{ categoria.categoria }}
+                                    {% endif %}
+                                {% endfor %}
+                            </td>                        
+                            <!-- Eliminamos el prefijo 'static' extra -->
+                            <td><img src="{{ url_for('static', filename='img/' + producto.foto) }}" class="img-fluid img-thumbnail" alt="Foto de producto" style="max-width: 100px;"></td>
+                            <td>
+                                <a href="{{ url_for('editar_producto', producto_id=producto.id) }}" class="btn btn-sm btn-warning"><i class="fas fa-edit"></i></a>
+                                <button class="btn btn-sm btn-danger" onclick="confirmarEliminacion({{ producto.id }})"><i class="fas fa-trash-alt"></i></button>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+
+                </table>  
+
+            </div>
+            
+        </div>
+        
+    </div>
+    <!-- /.card -->
+
+   </section>
+<!-- /.content -->
+</div>
+
+<script>
+    $(document).ready(function() {
+        $('#productosTable').DataTable({
+            dom: 'Bfrtip',
+            buttons: [
+                'copy', 'excel', 'pdf', 'print'
+                ]
+        });
+    });
+    
+    function confirmarEliminacion(id) {
+        Swal.fire({
+            title: '¿Estás seguro?',
+            text: 'No podrás deshacer esta acción',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Sí, eliminar',
+            cancelButtonText: 'Cancelar'
+        }).then((result) => {
+            if (result.isConfirmed) {
+            // Esperar hasta que se muestre el mensaje de éxito
+                Swal.fire({
+                    title: '¡Eliminado!',
+                    text: 'El producto ha sido eliminado con éxito.',
+                    icon: 'success',
+                    timer: 1500, 
+                    timerProgressBar: true,
+                    showConfirmButton: false
+                }).then(() => {
+                // Redirigir a la ruta de eliminar con el ID del producto
+                    window.location.href = '/eliminar_producto/' + id;
+                });
+            }
+        });
+    }
+
+</script>
+
+{% endblock %}

@@ -1,0 +1,182 @@
+{% extends 'index.html' %}
+
+{% block dynamic_content %}
+<div class="content-wrapper" style="min-height: 1604.44px;">
+  <!-- Content Header (Page header) -->
+  <section class="content-header">
+    <div class="container-fluid">
+      <div class="row mb-2">
+        <div class="col-sm-6">
+          <h1>Usuarios</h1>
+        </div>
+        <div class="col-sm-6">
+          <ol class="breadcrumb float-sm-right">
+            <li class="breadcrumb-item"><a href="/inicio">Inicio</a></li>
+            <li class="breadcrumb-item active">Usuarios</li>
+          </ol>
+        </div>
+      </div>
+    </div><!-- /.container-fluid -->
+  </section>
+
+  <!-- Main content -->
+  <section class="content">
+
+    <!-- Default box -->
+    <div class="card">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                    <strong>Mensaje!</strong> {{ message }}
+                    <button type="button" class="close" data-bs-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+        <div class="card-header">
+            <div class="d-flex justify-content-between">
+                <h4>Lista de Usuarios</h4>
+                <a href="{{ url_for('agregar_usuario') }}" class="btn btn-primary mb-3"><i class="fas fa-plus"></i> Agregar Usuario</a>
+            </div>
+            
+        </div>
+        <div class="card-body">
+
+            <div class="table-responsive">
+
+                <table id="usuariosTable" class="table table-bordered table-hover table-striped" width="100%">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Estado</th>
+                            <th>Nombre</th>
+                            <th>Email</th>
+                            <th>Perfil</th>
+                            <th>Foto</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for usuario in usuarios %}
+                        <tr>
+                            <td>{{ loop.index }}</td>
+                            <td>
+                                {% if usuario.estado == "active" %}
+                                    <div class='custom-control custom-switch'>
+                                        <input type='checkbox' class='custom-control-input' id='switch{{ loop.index }}' checked='' onchange='changeStatus(event,{{ usuario.id }})'>
+                                        <label class='custom-control-label' for='switch{{ loop.index }}' style='cursor:pointer'></label>
+                                    </div>
+                                {% else %}
+                                    <div class='custom-control custom-switch'>
+                                        <input type='checkbox' class='custom-control-input' id='switch{{ loop.index }}' onchange='changeStatus(event,{{ usuario.id }})'>
+                                        <label class='custom-control-label' for='switch{{ loop.index }}' style='cursor:pointer'></label>
+                                    </div>
+                                {% endif %}
+                            </td>
+                            <td>{{ usuario.nombre }}</td>
+                            <td>{{ usuario.email }}</td>
+                            <td>
+                                {% if usuario.perfil == "admin" %}
+                                    <span class="badge badge-primary">{{ usuario.perfil }}</span>
+                                {% else %}
+                                    <span class="badge badge-info">{{ usuario.perfil }}</span>
+                                {% endif %} 
+                            </td>
+                            <td>
+                                {% if usuario.foto %}
+                                    <img src="{{ url_for('static', filename='img/'+usuario.foto) }}" alt="user photo" class='img-circle' style='width:60px'>
+                                {% else %}
+                                    <img src="{{ url_for('static', filename='img/users/default.png') }}" alt="user photo" class='img-circle' style='width:60px'>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <a href="{{ url_for('editar_usuario', usuario_id=usuario.id) }}" class="btn btn-sm btn-warning"><i class="fas fa-edit"></i></a>
+                                <button class="btn btn-sm btn-danger" onclick="confirmarEliminacion({{ usuario.id }})"><i class="fas fa-trash-alt"></i></button>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+        
+    </div>
+    <!-- /.card -->
+
+   </section>
+<!-- /.content -->
+</div>
+
+<script>
+    $(document).ready(function() {
+        $('#usuariosTable').DataTable({
+            responsive: true,
+            dom: 'Bfrtip',
+            buttons: [
+                'copy', 'excel', 'pdf', 'print'
+                ]
+        });
+    });
+
+    function changeStatus(event, id) {
+        var status = event.target.checked ? "active" : "Null"; 
+        var data = new FormData();
+        data.append("id", id);
+        data.append("estado", status);
+        $.ajax({
+            url: "/cambiar_status_us",
+            method: "POST",
+            data: data,
+            contentType: false,
+            cache: false,
+            processData: false,
+            success: function (response) {
+     
+                if (response && response.message) {
+                    location.reload();
+                } else if (response && response.error) {
+                    alert(response.error);
+                }
+            },
+            error: function (xhr, status, error) {
+                alert("Error al enviar la solicitud: " + error);
+            }
+        });
+    }    
+
+    function confirmarEliminacion(id) {
+        Swal.fire({
+            title: '¿Estás seguro?',
+            text: 'No podrás deshacer esta acción',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Sí, eliminar',
+            cancelButtonText: 'Cancelar'
+        }).then((result) => {
+            if (result.isConfirmed) {
+            // Esperar hasta que se muestre el mensaje de éxito
+                Swal.fire({
+                    title: '¡Eliminado!',
+                    text: 'El Usuario ha sido eliminado con éxito.',
+                    icon: 'success',
+                    timer: 1500, 
+                    timerProgressBar: true,
+                    showConfirmButton: false
+                }).then(() => {
+                    window.location.href = '/eliminar_usuario/' + id;
+                });
+            }
+        });
+    }
+
+</script>
+
+{% endblock %}
